@@ -90,6 +90,8 @@ export const createCurrentTaskSlice: MyStateCreator<CurrentTaskSlice> = (
 
           setActionStatus('pulling-dom');
           const pageDOM = await getSimplifiedDom();
+          // console.log('pageDOM', pageDOM);
+          // return;
           if (!pageDOM) {
             set((state) => {
               state.currentTask.status = 'error';

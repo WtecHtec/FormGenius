@@ -45,7 +45,9 @@ function generateSimplifiedDom(
 
   const interactive =
     element.getAttribute('data-interactive') === 'true' ||
-    element.hasAttribute('role');
+    element.hasAttribute('role') ||
+    element.getAttribute('contenteditable') ||
+    element.getAttribute('data-lexical-editor') ;
   const hasLabel =
     element.hasAttribute('aria-label') || element.hasAttribute('name');
   const includeNode = interactive || hasLabel;
@@ -66,6 +68,8 @@ function generateSimplifiedDom(
     'value',
     'role',
     'title',
+    'contenteditable',
+    'data-lexical-editor',
   ];
 
   for (const attr of allowedAttributes) {
