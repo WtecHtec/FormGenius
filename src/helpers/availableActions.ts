@@ -1,38 +1,41 @@
 export const availableActions = [
   {
     name: 'click',
-    description: 'Clicks on an element',
+    description: '【Precise Click】Click on a page element (e.g. button/link) using its numeric ID | Must use integer parameter, e.g. click(315)',
     args: [
       {
         name: 'elementId',
         type: 'number',
-      },
-    ],
+        description: 'Unique numeric identifier of the target element'
+      }
+    ]
   },
   {
     name: 'setValue',
-    description: 'Focuses on and sets the value of an input element',
+    description: '【Text Input】Enter text into a specified input field | Format: setValue(427, "username")',
     args: [
       {
         name: 'elementId',
         type: 'number',
+        description: 'Numeric ID of the input field'
       },
       {
         name: 'value',
         type: 'string',
-      },
-    ],
+        description: 'Text content to input (quotes auto-added)'
+      }
+    ]
   },
   {
     name: 'finish',
-    description: 'Indicates the task is finished',
-    args: [],
+    description: '【Success Termination】Use when task is fully completed | No parameters needed',
+    args: []
   },
   {
     name: 'fail',
-    description: 'Indicates that you are unable to complete the task',
-    args: [],
-  },
+    description: '【Failure Termination】Use when unable to locate target/encounter unresolvable errors | No parameters needed',
+    args: []
+  }
 ] as const;
 
 type AvailableAction = (typeof availableActions)[number];

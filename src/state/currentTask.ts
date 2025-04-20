@@ -129,7 +129,8 @@ export const createCurrentTaskSlice: MyStateCreator<CurrentTaskSlice> = (
 
           setActionStatus('performing-action');
           const action = parseResponse(query.response);
-
+          console.log('query', query.response);
+          console.log('action', action);
           set((state) => {
             state.currentTask.history.push({
               prompt: query.prompt,
@@ -150,14 +151,37 @@ export const createCurrentTaskSlice: MyStateCreator<CurrentTaskSlice> = (
             break;
           }
 
-          if (action.parsedAction.name === 'click') {
-            await callDOMAction('click', action.parsedAction.args);
-          } else if (action.parsedAction.name === 'setValue') {
-            await callDOMAction(
-              action?.parsedAction.name,
-              action?.parsedAction.args
-            );
+           // 处理多个actions
+           if (action.parsedActions && action.parsedActions.length > 0) {
+            // 按顺序执行所有actions
+            for (const parsedAction of action.parsedActions) {
+              if (wasStopped()) break;
+              
+              console.log('执行action:', parsedAction.name, parsedAction.args);
+              
+              if (parsedAction.name === 'finish' || parsedAction.name === 'fail') {
+                break; // 如果遇到finish或fail，停止执行后续actions
+              }
+              
+              // 执行DOM操作
+              if (parsedAction.name === 'click' || parsedAction.name === 'setValue') {
+                await callDOMAction(parsedAction.name, parsedAction.args);
+                // 每个action之间添加短暂延迟，确保DOM有时间响应
+                await sleep(500);
+              }
+            }
+          } else {
+            // 向后兼容，处理单个action
+            if (action.parsedAction.name === 'click') {
+              await callDOMAction('click', action.parsedAction.args);
+            } else if (action.parsedAction.name === 'setValue') {
+              await callDOMAction(
+                action?.parsedAction.name,
+                action?.parsedAction.args
+              );
+            }
           }
+
 
           if (wasStopped()) break;
 
@@ -170,6 +194,7 @@ export const createCurrentTaskSlice: MyStateCreator<CurrentTaskSlice> = (
           setActionStatus('waiting');
           // sleep 2 seconds. This is pretty arbitrary; we should figure out a better way to determine when the page has settled.
           await sleep(2000);
+          break
         }
         set((state) => {
           state.currentTask.status = 'success';
@@ -189,5 +214,18 @@ export const createCurrentTaskSlice: MyStateCreator<CurrentTaskSlice> = (
         state.currentTask.status = 'interrupted';
       });
     },
+    
+     // 新增方法：保存当前任务到历史记录
+     saveCurrentTaskToHistory: (name: string) => {
+      const instructions = get().currentTask.instructions;
+      
+      if (!instructions) {
+        console.error('无法保存历史记录：没有指令内容');
+        return;
+      }
+      
+      // 调用 actionHistory 的 saveAction 方法
+      get().actionHistory.actions.saveAction(name, instructions);
+    }
   },
 });

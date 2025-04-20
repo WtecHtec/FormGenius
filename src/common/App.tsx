@@ -1,9 +1,10 @@
-import { Box, ChakraProvider, Heading, HStack } from '@chakra-ui/react';
+import { Box, ChakraProvider, Heading, HStack, Divider } from '@chakra-ui/react';
 import React from 'react';
 import { useAppState } from '../state/store';
 import ModelDropdown from './ModelDropdown';
 import SetAPIKey from './SetAPIKey';
 import TaskUI from './TaskUI';
+import ActionHistoryPanel from './ActionHistoryPanel';
 import logo from '../assets/img/icon-128.png';
 
 const App = () => {
@@ -28,7 +29,9 @@ const App = () => {
             <ModelDropdown />
           </Box>
         </HStack>
-        {openAIKey ? <TaskUI /> : <SetAPIKey />}
+        <TaskUI />
+        <Divider my={4} />
+        {/* <ActionHistoryPanel /> */}
       </Box>
     </ChakraProvider>
   );
